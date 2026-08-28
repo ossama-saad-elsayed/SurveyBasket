@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Mapster;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SurveyBasket.Contracts.Requests;
+using SurveyBasket.Contracts.Responses;
 using SurveyBasket.Models;
 using SurveyBasket.Services;
 
@@ -16,27 +19,38 @@ namespace SurveyBasket.Controllers
         }
 
         [HttpGet("GetAll")]
-        public IActionResult GetAll() => Ok(_pollService.GetAll());
+        public IActionResult GetAll()
+        { 
+        var polls = _pollService.GetAll();
+        var response = polls.Adapt<IEnumerable<PollResponse>>();
+            return Ok(response);
+        }
 
 
         [HttpGet("{id}")]
-        public IActionResult Get(int id) { 
+        public IActionResult Get( [FromRoute ] int id) { 
             var poll = _pollService.Get(id);
-            return poll is null ? NotFound() : Ok(poll);
+
+            if (poll is null)
+                return NotFound();
+
+            var response = poll.Adapt<PollResponse>();
+
+           return    Ok(response);
         }
 
         [HttpPost("")]
-        public IActionResult Add(Poll Request)
+        public IActionResult Add([FromBody] CreatePollRequest Request)
         {
-            var Newpoll  = _pollService.Add(Request);
-            return CreatedAtAction(nameof(Get), new { ID = Newpoll.Id }, Request);
+            var Newpoll  = _pollService.Add(Request.Adapt<Poll>());
+            return CreatedAtAction(nameof(Get), new { ID = Newpoll.Id }, Newpoll);
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(int id ,Poll Request)
+        public IActionResult Update([FromRoute] int id , [FromBody] CreatePollRequest Request)
         {
             
-            var isUpdated  = _pollService.Update(id, Request);
+            var isUpdated  = _pollService.Update(id, Request.Adapt<Poll>());
 
             if (!isUpdated)
                 return NotFound();
@@ -47,7 +61,7 @@ namespace SurveyBasket.Controllers
         }
 
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public IActionResult Delete([FromRoute] int id)
         {
             var isDelete = _pollService.Delete(id);
 
