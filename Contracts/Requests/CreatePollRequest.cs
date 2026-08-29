@@ -1,8 +1,13 @@
 ﻿using SurveyBasket.Contracts.Responses;
-using SurveyBasket.Models;
+using SurveyBasket.Entities;
 
 namespace SurveyBasket.Contracts.Requests
 {
-    public record CreatePollRequest (string title, string description);
-    
+    public record CreatePollRequest (
+       string Title,
+        string Summary,
+        bool IsPublished,
+        DateOnly StartAt,
+        DateOnly EndAt);
+
 }

@@ -1,17 +1,19 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using SurveyBasket.Models;
+using SurveyBasket.Entities;
 
 namespace SurveyBasket.Services
 {
     public interface IPollService
     {
-        IEnumerable<Poll> GetAll();
+       Task< IEnumerable<Poll> > GetAllAsync(CancellationToken cancellationToken = default);
 
-        Poll? Get( int id);
-        Poll Add(Poll request);
+       Task< Poll?> GetAsync(int id,CancellationToken cancellationToken = default);
+        Task <Poll> AddAsync(Poll request, CancellationToken cancellationToken = default);
 
-        bool Update ( int id, Poll request);
+      Task < bool> UpdateAsync(int id, Poll request, CancellationToken cancellationToken = default);
 
-        bool Delete(int id);
+        Task<bool> Delete(int id, CancellationToken cancellationToken = default);
+
+        Task<bool> TogglePublishAsync(int id, CancellationToken cancellationToken = default);
     }
 }
