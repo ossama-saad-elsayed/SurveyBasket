@@ -10,6 +10,7 @@ using FluentValidation;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using SurveyBasket.Persistence;
 using Microsoft.EntityFrameworkCore;
+using SurveyBasket.Entities;
 namespace SurveyBasket
 {
     public class Program
@@ -19,7 +20,6 @@ namespace SurveyBasket
             var builder = WebApplication.CreateBuilder(args);
             builder.Services.AddDependencies(builder.Configuration);
             // Add services to the container.
-            
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

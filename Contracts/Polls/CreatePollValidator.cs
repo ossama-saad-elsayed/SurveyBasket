@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
-using SurveyBasket.Contracts.Requests;
-namespace SurveyBasket.Contracts.Validations
+
+namespace SurveyBasket.Contracts.Polls
 {
     public class CreatePollRequestValidator : AbstractValidator<CreatePollRequest>
     {
@@ -27,7 +27,7 @@ namespace SurveyBasket.Contracts.Validations
 
         private bool HasVaildDate(CreatePollRequest createPollRequest)
         {
-            return (createPollRequest.EndAt >= createPollRequest.StartAt);
+            return createPollRequest.EndAt >= createPollRequest.StartAt;
         }
     }
 }
