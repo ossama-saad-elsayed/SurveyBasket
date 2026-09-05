@@ -1,9 +1,12 @@
 ﻿using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using SurveyBasket.Abstractions;
 using SurveyBasket.Contracts.Polls;
 using SurveyBasket.Entities;
+using SurveyBasket.Errors;
 using SurveyBasket.Services;
 using System.Threading.Tasks;
 
@@ -32,31 +35,26 @@ namespace SurveyBasket.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> Get([FromRoute] int id, CancellationToken cancellationToken)
         {
-            var poll = await _pollService.GetAsync(id, cancellationToken);
+            var result = await _pollService.GetAsync(id, cancellationToken);
 
-            if (poll is null)
-                return NotFound();
-
-            var response = poll.Adapt<PollResponse>();
-
-            return Ok(response);
+            return result.IsSuccess ? Ok(result.Value) : result.ToProblem();
         }
 
         [HttpPost("")]
-        public async Task < IActionResult> Add([FromBody] CreatePollRequest Request, CancellationToken cancellationToken)
+        public async Task<IActionResult> Add([FromBody] CreatePollRequest Request, CancellationToken cancellationToken)
         {
-            var Newpoll = await _pollService.AddAsync(Request.Adapt<Poll>(), cancellationToken);
-            return CreatedAtAction(nameof(Get), new { ID = Newpoll.Id }, Newpoll.Adapt<PollResponse>());
+            var result = await _pollService.AddAsync(Request, cancellationToken);
+            return result.IsSuccess ?  CreatedAtAction(nameof(Get), new { ID = result.Value.Id }, result) :result.ToProblem() ;
+
         }
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Update([FromRoute] int id, [FromBody] CreatePollRequest Request, CancellationToken cancellationToken)
         {
 
-            var isUpdated =  await _pollService.UpdateAsync(id, Request.Adapt<Poll>(),  cancellationToken);
-
-            if (!isUpdated)
-                return NotFound();
+            var result =  await _pollService.UpdateAsync(id, Request,  cancellationToken);
+            if (result.IsFailure)
+                return result.ToProblem();
 
 
 
@@ -64,12 +62,12 @@ namespace SurveyBasket.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task< IActionResult> Delete([FromRoute] int id, CancellationToken cancellationToken )
+        public async Task<IActionResult> Delete([FromRoute] int id, CancellationToken cancellationToken)
         {
-            var isDelete =  await _pollService.Delete(id, cancellationToken);
+            var result = await _pollService.Delete(id, cancellationToken);
 
-            if (!isDelete)
-                return NotFound();
+            if (result.IsFailure)
+                return result.ToProblem();
 
 
 
@@ -77,13 +75,13 @@ namespace SurveyBasket.Controllers
         }
 
         [HttpPut("{id}/TogglePublish")]
-        public async Task<IActionResult> TogglePublish([FromRoute] int id,  CancellationToken cancellationToken)
+        public async Task<IActionResult> TogglePublish([FromRoute] int id, CancellationToken cancellationToken)
         {
 
-            var isUpdated = await _pollService.TogglePublishAsync(id,cancellationToken);
+            var result = await _pollService.TogglePublishAsync(id, cancellationToken);
 
-            if (!isUpdated)
-                return NotFound();
+            if (result.IsFailure)
+                return result.ToProblem();
 
 
 

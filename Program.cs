@@ -31,11 +31,12 @@ namespace SurveyBasket
 
             app.UseHttpsRedirection();
 
+            app.UseCors();
             app.UseAuthorization();
 
 
             app.MapControllers();
-
+            app.UseExceptionHandler();
             app.Run();
         }
     }

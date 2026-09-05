@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using SurveyBasket.Abstractions;
+using SurveyBasket.Contracts.Polls;
 using SurveyBasket.Entities;
 
 namespace SurveyBasket.Services
@@ -7,13 +9,13 @@ namespace SurveyBasket.Services
     {
        Task< IEnumerable<Poll> > GetAllAsync(CancellationToken cancellationToken = default);
 
-       Task< Poll?> GetAsync(int id,CancellationToken cancellationToken = default);
-        Task <Poll> AddAsync(Poll request, CancellationToken cancellationToken = default);
+       Task<Result<PollResponse>> GetAsync(int id,CancellationToken cancellationToken = default);
+        Task<Result<PollResponse>> AddAsync(CreatePollRequest request, CancellationToken cancellationToken = default);
 
-      Task < bool> UpdateAsync(int id, Poll request, CancellationToken cancellationToken = default);
+        Task<Result> UpdateAsync(int id, CreatePollRequest request, CancellationToken cancellationToken = default);
 
-        Task<bool> Delete(int id, CancellationToken cancellationToken = default);
+        Task<Result> Delete(int id, CancellationToken cancellationToken = default);
 
-        Task<bool> TogglePublishAsync(int id, CancellationToken cancellationToken = default);
+        Task<Result> TogglePublishAsync(int id, CancellationToken cancellationToken = default);
     }
 }

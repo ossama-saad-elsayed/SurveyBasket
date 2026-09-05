@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using SurveyBasket.Services;
 using SurveyBasket.Contracts.Authentication;
+using SurveyBasket.Abstractions;
 namespace SurveyBasket.Controllers
 {
     [Route("[controller]")]
@@ -17,13 +18,15 @@ namespace SurveyBasket.Controllers
 
         [HttpPost("")]
         public async Task<IActionResult> Login([FromBody] LoginRequset request, CancellationToken cancellation)
-        {
+        {    
             var Loginresponse = await _authService.GetTokenAsync(request.Email, request.Password, cancellation);
 
-            if (Loginresponse == null)
-                return BadRequest("invaild password or email");
+            return Loginresponse.IsSuccess ? Ok(Loginresponse.Value) : Loginresponse.ToProblem();
 
-            return Ok(Loginresponse);
+
+
+
+
         }
         [HttpPost("refresh")]
 
@@ -31,10 +34,9 @@ namespace SurveyBasket.Controllers
         {
             var authResult = await _authService.GetRefreshTokenAsync(request.Token,request.RefreshToken, cancellation);
 
-            if (authResult == null)
-                return BadRequest("invaild Token ");
-
-            return Ok(authResult);
+            if (authResult.IsFailure)
+                return authResult.ToProblem();
+            return Ok(authResult.Value);
         }
 
         [HttpPut("revok-refresh-token")]
@@ -42,8 +44,8 @@ namespace SurveyBasket.Controllers
         {
             var authResult = await _authService.RevokTokenAsync(request.Token, request.RefreshToken, cancellation);
 
-            if (authResult == false)
-                return BadRequest("invaild Token ");
+            if (authResult.IsFailure)
+                return authResult.ToProblem();
 
             return Ok();
         }

@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using SurveyBasket.Errors;
 
 namespace SurveyBasket
 {
@@ -25,6 +26,14 @@ namespace SurveyBasket
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
 
+            services.AddCors(options=>options.
+            AddDefaultPolicy(bulider=>
+            bulider.
+             AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowAnyOrigin()
+            )
+            );
 
             var connectionstring = configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<ApplicationDbContext>(optionsAction => optionsAction.UseSqlServer(connectionstring));
@@ -63,6 +72,8 @@ namespace SurveyBasket
             services.AddScoped<IPollService, PollService>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddSingleton<IJwtProvider, JwtProvider>();
+            services.AddExceptionHandler<GlobalExceptionHnadler>();
+            services.AddProblemDetails();
             services.AddFluentValidationAutoValidation();
             services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 

@@ -12,7 +12,7 @@
 
 
 
-        public User CreatedBy { get; set; } = default;
+        public User CreatedBy { get; set; } = default!;
 
 
 
